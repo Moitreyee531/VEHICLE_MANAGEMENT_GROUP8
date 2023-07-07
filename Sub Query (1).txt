@@ -1,0 +1,37 @@
+
+//Fuel consumption of each vehicle
+SELECT vehicle.vehicle_id as "Vehicle ID", type_of_vehicle as "Type", classification as "Classification", KMPL as "KMPL", SUM(fuel_consumption) as "Fuel Consumption"
+FROM vehicle
+JOIN trip ON vehicle.vehicle_id = trip.vehicle_id
+GROUP BY vehicle.vehicle_id, type_of_vehicle, classification, KMPL;
+
+
+//Driver whose leave is close to due
+SELECT DRIVER.DRIVER_ID, DRIVER.DRIVER_NAME, DRIVER.QUALIFICATION, DRIVER.AVAILABILITY, DRIVER.UNIT_NAME, leave_due
+FROM DRIVER
+JOIN LEAVE ON DRIVER.DRIVER_ID = LEAVE.DRIVER_ID
+WHERE LEAVE.LEAVE_DUE >= SYSDATE
+ORDER BY LEAVE.LEAVE_DUE ASC;
+
+//Trips which has crossed 74 mile  
+SELECT TRIP_ID, EXPECTED_TRIP_DISTANCE, FUEL_CONSUMPTION, AUTHORITY_NUMBER, IN_METER, OUT_METER, DISTANCE_TRAVELLED, REMARKS, VEHICLE_ID
+FROM TRIP
+WHERE DISTANCE_TRAVELLED > 74;
+
+
+//Vehicles whose return date from workshop is closer 
+
+SELECT *
+    FROM WORKSHOP W
+    WHERE W.DATE_OF_RETURN >= SYSDATE
+    ORDER BY W.DATE_OF_RETURN ASC
+
+
+//Driver's availability
+UPDATE DRIVER
+SET AVAILABILITY = 'Unavailable'
+WHERE DRIVER_ID IN (
+    SELECT DRIVER_ID
+    FROM LEAVE
+    WHERE LEAVE_DUE = SYSDATE
+);

@@ -1,0 +1,85 @@
+CREATE OR REPLACE TRIGGER update_availability_trigger
+BEFORE INSERT OR UPDATE ON "LEAVE"
+FOR EACH ROW
+DECLARE
+    v_driver_availability VARCHAR(20);
+BEGIN
+  
+    IF :new.END_DATE = SYSDATE THEN
+       v_driver_availability := 'Available';
+        UPDATE "DRIVER"
+        SET AVAILABILITY = v_driver_availability
+        WHERE DRIVER_ID = :new.DRIVER_ID;
+    END IF;
+END;
+
+
+CREATE OR REPLACE TRIGGER update_driver_leave
+AFTER INSERT OR UPDATE ON "LEAVE"
+FOR EACH ROW
+BEGIN
+    IF :new.DRIVER_ID IS NOT NULL THEN
+        UPDATE "DRIVER" SET AVAILABILITY = 'ON LEAVE' WHERE DRIVER_ID = :new.DRIVER_ID;
+    END IF;
+END;
+
+
+CREATE OR REPLACE TRIGGER update_service_status
+AFTER INSERT ON "WORKSHOP"
+FOR EACH ROW
+BEGIN
+  UPDATE "VEHICLE"
+  SET service_status = 'Workshop'
+  WHERE VEHICLE_ID = :new.VEHICLE_ID;
+END;
+
+
+CREATE OR REPLACE TRIGGER update_driver_availability_on_trip
+AFTER INSERT ON "TRIP"
+FOR EACH ROW
+BEGIN
+  UPDATE "DRIVER"
+  SET availability = 'On trip'
+  WHERE DRIVER_ID = :new.DRIVER_ID;
+END;
+
+
+CREATE OR REPLACE TRIGGER update_driver_availability_available
+AFTER UPDATE ON "TRIP"
+FOR EACH ROW
+BEGIN
+  UPDATE "DRIVER"
+  SET availability = 'Available'
+  WHERE DRIVER_ID = :new.DRIVER_ID;
+END;
+
+
+CREATE OR REPLACE TRIGGER update_vehicle_availability_on_trip
+AFTER INSERT ON "TRIP"
+FOR EACH ROW
+BEGIN
+  UPDATE "VEHICLE"
+  SET service_status = 'On trip'
+  WHERE VEHICLE_ID = :new.VEHICLE_ID;
+END;
+
+CREATE OR REPLACE TRIGGER update_vehicle_availability_available
+AFTER UPDATE ON "TRIP"
+FOR EACH ROW
+BEGIN
+  UPDATE "DRIVER"
+  SET service_status = 'Available'
+  WHERE VEHICLE_ID = :new.VEHICLE_ID;
+END;
+
+CREATE OR REPLACE TRIGGER update_driver_availability
+AFTER DELETE ON "LEAVE"
+FOR EACH ROW
+BEGIN
+    IF :old.DRIVER_ID IS NOT NULL THEN
+        UPDATE "DRIVER" SET AVAILABILITY = 'Available' WHERE DRIVER_ID = :old.DRIVER_ID;
+    END IF;
+END;
+
+
+

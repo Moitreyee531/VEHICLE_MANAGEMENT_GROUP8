@@ -1,0 +1,17 @@
+CREATE VIEW view_name AS
+SELECT vehicle_id, type_of_vehicle, classification, KMPL, total_fuel_consumption
+FROM (
+  SELECT vehicle.vehicle_id, vehicle.type_of_vehicle, vehicle.classification, vehicle.KMPL, 
+    SUM(trip.fuel_consumption) AS total_fuel_consumption,
+    ROW_NUMBER() OVER (PARTITION BY vehicle.vehicle_id ORDER BY vehicle.vehicle_id) AS rn
+  FROM vehicle
+  LEFT OUTER JOIN trip ON vehicle.vehicle_id = trip.vehicle_id
+  GROUP BY vehicle.vehicle_id, vehicle.type_of_vehicle, vehicle.classification, vehicle.KMPL
+) subquery
+WHERE rn = 1;
+
+
+ALTER VIEW view_name
+AS
+SELECT * FROM view_name
+WHERE vehicle.owner_unit = :username AND vehicle.service_status = :serviceStatus;

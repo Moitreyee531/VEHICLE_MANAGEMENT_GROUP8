@@ -1,0 +1,34 @@
+CREATE OR REPLACE PROCEDURE GetWorkshopDetails(
+    p_VehicleID IN WORKSHOP.VEHICLE_ID%TYPE,
+    p_Reason OUT WORKSHOP.REASON%TYPE,
+    p_EntryDate OUT WORKSHOP.ENTRY_DATE%TYPE
+) AS
+BEGIN
+    SELECT REASON, ENTRY_DATE
+    INTO p_Reason, p_EntryDate
+    FROM WORKSHOP
+    WHERE VEHICLE_ID = p_VehicleID;
+
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            p_Reason := NULL;
+            p_EntryDate := NULL;
+END;
+
+
+CREATE OR REPLACE PROCEDURE GetDriverWorkshopDetails(
+    p_DriverID IN DRIVER.DRIVER_ID%TYPE,
+    p_Qualification OUT DRIVER.QUALIFICATION%TYPE,
+    p_Availability OUT DRIVER.AVAILABILITY%TYPE
+) AS
+BEGIN
+    SELECT QUALIFICATION, AVAILABILITY
+    INTO p_Qualification, p_Availability
+    FROM DRIVER
+    WHERE DRIVER_ID = p_DriverID;
+
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            p_Qualification := NULL;
+            p_Availability := NULL;
+END;
